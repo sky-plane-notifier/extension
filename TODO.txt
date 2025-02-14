@@ -1,0 +1,1 @@
+[] when I click on select, the airline website should be open on a new tab

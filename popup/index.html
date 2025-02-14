@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flight Search</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-blue-50">
+    <div class="container p-4 w-[400px]">
+        <h1 class="text-3xl font-bold text-blue-800 mb-6 text-center">Flight Search</h1>
+        <form id="flightSearchForm" class="bg-white shadow-lg rounded-lg px-6 pt-6 pb-6 mb-4">
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="date">
+                    Travel Date
+                </label>
+                <input 
+                    class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                    type="date" 
+                    value="2025-02-13"
+                    id="date" 
+                    required
+                >
+            </div>
+            <div class="mb-4 relative">
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="from_airport">
+                    From
+                </label>
+                <input 
+                    class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                    type="text" 
+                    id="from_airport" 
+                    value="CMN"
+                    placeholder="Enter departure city" 
+                    required
+                >
+            </div>
+            <div class="mb-4 relative">
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="to_airport">
+                    To
+                </label>
+                <input 
+                    class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                    type="text" 
+                    id="to_airport" 
+                    value="AGA"
+                    placeholder="Enter destination city" 
+                    required
+                >
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="cabin_class">
+                    Cabin Class
+                </label>
+                <select 
+                    class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                    id="cabin_class" 
+                    required
+                >
+                    <option value="">Select Cabin Class</option>
+                    <option value="economy" selected>Economy</option>
+                    <option value="business">Business</option>
+                </select>
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="trip_type">
+                    Trip Type
+                </label>
+                <select 
+                    class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                    id="trip_type" 
+                    required
+                >
+                    <option value="">Select Trip Type</option>
+                    <option value="one-way" selected>One-way</option>
+                    <option value="return">Return</option>
+                </select>
+            </div>
+            <div class="mb-6">
+                <label class="block text-gray-700 text-sm font-bold mb-2">
+                    Passengers
+                </label>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-gray-600 text-xs mb-1" for="adults">
+                            Adults (12+ years)
+                        </label>
+                        <input 
+                            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                            type="number" 
+                            id="adults" 
+                            min="1" 
+                            max="9" 
+                            value="1" 
+                            required
+                        >
+                    </div>
+                    <div>
+                        <label class="block text-gray-600 text-xs mb-1" for="children">
+                            Children (2-11 years)
+                        </label>
+                        <input 
+                            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                            type="number" 
+                            id="children" 
+                            min="0" 
+                            max="9" 
+                            value="0"
+                        >
+                    </div>
+                    <div>
+                        <label class="block text-gray-600 text-xs mb-1" for="infants_in_seat">
+                            Infants with seat
+                        </label>
+                        <input 
+                            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                            type="number" 
+                            id="infants_in_seat" 
+                            min="0" 
+                            max="9" 
+                            value="0"
+                        >
+                    </div>
+                    <div>
+                        <label class="block text-gray-600 text-xs mb-1" for="infants_on_lap">
+                            Infants on lap
+                        </label>
+                        <input 
+                            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                            type="number" 
+                            id="infants_on_lap" 
+                            min="0" 
+                            max="9" 
+                            value="0"
+                        >
+                    </div>
+                </div>
+            </div>
+            <div class="flex items-center justify-center">
+                <button 
+                    class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition-colors duration-200" 
+                    type="submit"
+                >
+                    Search Flights
+                </button>
+            </div>
+        </form>
+        <div id="loader" class="loader hidden">🔄 Loading...</div>
+        <div id="results" class="mt-8"></div>
+    </div>
+    <script src="popup.js"></script>
+</body>
+</html>
+

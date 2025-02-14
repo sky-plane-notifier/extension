@@ -1,0 +1,59 @@
+body {
+  width: 35rem;
+}
+.autocomplete-items {
+  position: absolute;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  max-height: 250px;
+  overflow-y: auto;
+  width: 100%;
+  z-index: 1000;
+}
+
+.autocomplete-option {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.autocomplete-option:hover {
+  background: #f2f2f2;
+}
+
+.airport-icon {
+  font-size: 18px;
+  margin-right: 10px;
+}
+
+.airport-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.airport-name {
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.airport-location {
+  font-size: 12px;
+  color: gray;
+}
+
+.autocomplete-active {
+  background: #e0e0e0 !important;
+}
+.loader {
+  padding: 10px;
+  font-size: 14px;
+  color: gray;
+  text-align: center;
+}
+
+.hidden {
+  display: none;
+}
