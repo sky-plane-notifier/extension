@@ -1,18 +1,23 @@
+
+const LOADER_ID = "loader"
+const ERROR_ID = "error"
+const RESULTS_ID = "results"
+
+function show(elemntId) {
+  const elemnt = document.getElementById(elemntId);
+  elemnt.classList.remove("hidden");
+}
+
+function hide(elemntId) {
+  const elemnt = document.getElementById(elemntId);
+  elemnt.classList.add("hidden");
+}
+
+
 function highlightMatch(text, search) {
   const regex = new RegExp(`(${search})`, "gi");
   return text.replace(regex, "<strong>$1</strong>");
 }
-
-function showLoader() {
-  const loader = document.getElementById("loader");
-  loader.classList.remove("hidden");
-}
-
-function hideLoader() {
-  const loader = document.getElementById("loader");
-  loader.classList.add("hidden");
-}
-
 
 document.addEventListener("DOMContentLoaded", () => {
   
@@ -133,6 +138,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   form.addEventListener("submit", async (e) => {
     e.preventDefault()
+    hide(RESULTS_ID)
 
     const date = document.getElementById("date").value
     const from_airport = document.getElementById("from_airport").value
@@ -158,7 +164,8 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     }
 
-    showLoader();
+    hide(ERROR_ID) 
+    show(LOADER_ID)
 
     const backendUrl = "http://localhost:8000"
     const response = await fetch(`${backendUrl}/flights`, {
@@ -170,11 +177,18 @@ document.addEventListener("DOMContentLoaded", () => {
       body: JSON.stringify(flightFilterBody), 
     });
 
+    if (!response.ok) {
+      hide(LOADER_ID)
+      show(ERROR_ID)
+      return;
+    }
+    
     const flights = await response.json();
-    hideLoader();
+    hide(LOADER_ID)
  
 
     // Display results header
+    show(RESULTS_ID)
     resultsDiv.innerHTML = `
         <div class="mb-6">
           <h2 class="text-2xl font-bold text-blue-800">Flight Results</h2>
