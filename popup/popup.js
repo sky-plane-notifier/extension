@@ -3,6 +3,24 @@ const LOADER_ID = "loader"
 const ERROR_ID = "error"
 const RESULTS_ID = "results"
 
+const observer = new MutationObserver(() => {
+  document.querySelectorAll(".openURL").forEach((button) => {
+      if (!button.dataset.listener) { // Prevent duplicate listeners
+          button.dataset.listener = "true";
+          button.addEventListener("click", () => {
+              chrome.runtime.sendMessage({ id: "openURL", url: button.dataset.airline })
+          })
+      }
+  });
+});
+
+observer.observe(document.body, { childList: true, subtree: true })
+
+
+function openURL(url) {
+  chrome.runtime.sendMessage({ id: "openURL", url })
+}
+
 function show(elemntId) {
   const elemnt = document.getElementById(elemntId);
   elemnt.classList.remove("hidden");
@@ -15,12 +33,18 @@ function hide(elemntId) {
 
 
 function highlightMatch(text, search) {
+  if (text === undefined) return ""
   const regex = new RegExp(`(${search})`, "gi");
   return text.replace(regex, "<strong>$1</strong>");
 }
 
 document.addEventListener("DOMContentLoaded", () => {
   
+  const today = new Date()
+  const day = (today.getDate() < 10) ? `0${today.getDate()}` : today.getDate()
+  const month = (today.getMonth() + 1 < 10) ? `0${today.getMonth() + 1}` : today.getMonth() + 1
+  document.getElementById("date").value = `${today.getFullYear()}-${month}-${day}`
+
   const form = document.getElementById("flightSearchForm")
   const resultsDiv = document.getElementById("results")
   const fromAirport = document.getElementById("from_airport")
@@ -31,13 +55,12 @@ document.addEventListener("DOMContentLoaded", () => {
     const backendUrl = "http://localhost:8000";
 
     try {
-      const response = await fetch(`${backendUrl}/airports`, {
-        method: "POST",
+      const response = await fetch(`${backendUrl}/airports?search=${search}`, {
+        method: "GET",
         mode: "cors",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ search }),
       });
   
       const data = await response.json();
@@ -233,12 +256,12 @@ document.addEventListener("DOMContentLoaded", () => {
                   <div class="flex flex-col items-end">
                     <span class="text-2xl font-bold text-blue-900">${flight.price}</span>
                   </div>
-                  <a href="${flight.airline.website}" class="bg-blue-900 hover:bg-blue-800 text-white font-semibold px-6 py-2 rounded-lg flex items-center gap-2 transition-colors">
+                  <button data-airline="${flight.airline.website}" class="openURL bg-blue-900 hover:bg-blue-800 text-white font-semibold px-6 py-2 rounded-lg flex items-center gap-2 transition-colors">
                     Select 
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
                     </svg>
-                  </a>
+                  </button>
                 </div>
                 <button class="text-gray-400 hover:text-red-500 transition-colors">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
