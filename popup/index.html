@@ -12,13 +12,13 @@
         <h1 class="text-3xl font-bold text-blue-800 mb-6 text-center">Flight Search</h1>
         <form id="flightSearchForm" class="bg-white shadow-lg rounded-lg px-6 pt-6 pb-6 mb-4">
             <div class="mb-4">
-                <label class="block text-gray-700 text-sm font-bold mb-2" for="date">
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="fly_date">
                     Travel Date
                 </label>
                 <input 
                     class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500" 
                     type="date" 
-                    id="date" 
+                    id="fly_date" 
                     required
                 >
             </div>
@@ -82,13 +82,13 @@
                 </label>
                 <div class="grid grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-gray-600 text-xs mb-1" for="adults">
+                        <label class="block text-gray-600 text-xs mb-1" for="nb_adults">
                             Adults (12+ years)
                         </label>
                         <input 
                             class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500" 
                             type="number" 
-                            id="adults" 
+                            id="nb_adults" 
                             min="1" 
                             max="9" 
                             value="1" 
@@ -96,39 +96,39 @@
                         >
                     </div>
                     <div>
-                        <label class="block text-gray-600 text-xs mb-1" for="children">
+                        <label class="block text-gray-600 text-xs mb-1" for="nb_children">
                             Children (2-11 years)
                         </label>
                         <input 
                             class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500" 
                             type="number" 
-                            id="children" 
+                            id="nb_children" 
                             min="0" 
                             max="9" 
                             value="0"
                         >
                     </div>
                     <div>
-                        <label class="block text-gray-600 text-xs mb-1" for="infants_in_seat">
+                        <label class="block text-gray-600 text-xs mb-1" for="nb_infants_in_seat">
                             Infants with seat
                         </label>
                         <input 
                             class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500" 
                             type="number" 
-                            id="infants_in_seat" 
+                            id="nb_infants_in_seat" 
                             min="0" 
                             max="9" 
                             value="0"
                         >
                     </div>
                     <div>
-                        <label class="block text-gray-600 text-xs mb-1" for="infants_on_lap">
+                        <label class="block text-gray-600 text-xs mb-1" for="nb_infants_on_lap">
                             Infants on lap
                         </label>
                         <input 
                             class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500" 
                             type="number" 
-                            id="infants_on_lap" 
+                            id="nb_infants_on_lap" 
                             min="0" 
                             max="9" 
                             value="0"
