@@ -1,16 +1,26 @@
-
 const LOADER_ID = "loader"
 const ERROR_ID = "error"
 const RESULTS_ID = "results"
 
+const selectButton = (airlineWebsite) => airlineWebsite ? `
+  <button data-airline="${airlineWebsite}" class="openURL bg-blue-900 hover:bg-blue-800 text-white font-semibold px-6 py-2 rounded-lg flex items-center gap-2 transition-colors">
+    Select 
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+    </svg>
+  </button>
+` : ""
+
 const observer = new MutationObserver(() => {
   document.querySelectorAll(".openURL").forEach((button) => {
-      if (!button.dataset.listener) { // Prevent duplicate listeners
-          button.dataset.listener = "true";
-          button.addEventListener("click", () => {
-              chrome.runtime.sendMessage({ id: "openURL", url: button.dataset.airline })
-          })
-      }
+    if(!button.dataset.airline) return
+
+    if (!button.dataset.listener) { // Prevent duplicate listeners
+        button.dataset.listener = "true";
+        button.addEventListener("click", () => {
+            chrome.runtime.sendMessage({ id: "openURL", url: button.dataset.airline })
+        })
+    }
   });
 });
 
@@ -38,12 +48,26 @@ function highlightMatch(text, search) {
   return text.replace(regex, "<strong>$1</strong>");
 }
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
   
-  const today = new Date()
-  const day = (today.getDate() < 10) ? `0${today.getDate()}` : today.getDate()
-  const month = (today.getMonth() + 1 < 10) ? `0${today.getMonth() + 1}` : today.getMonth() + 1
-  document.getElementById("date").value = `${today.getFullYear()}-${month}-${day}`
+  const flightFilter = (await chrome.storage.local.get("flightFilter")).flightFilter
+  
+  if (flightFilter) {
+    document.getElementById("from_airport").value = flightFilter.from_airport
+    document.getElementById("to_airport").value = flightFilter.to_airport
+    document.getElementById("fly_date").value = flightFilter.fly_date
+    document.getElementById("nb_adults").value = flightFilter.nb_adults
+    document.getElementById("nb_children").value = flightFilter.nb_children
+    document.getElementById("nb_infants_in_seat").value = flightFilter.nb_infants_in_seat
+    document.getElementById("nb_infants_on_lap").value = flightFilter.nb_infants_on_lap
+    document.getElementById("cabin_class").value = flightFilter.cabin_class
+    document.getElementById("trip_type").value = flightFilter.trip_type
+  } else {
+    const today = new Date()
+    const day = (today.getDate() < 10) ? `0${today.getDate()}` : today.getDate()
+    const month = (today.getMonth() + 1 < 10) ? `0${today.getMonth() + 1}` : today.getMonth() + 1
+    document.getElementById("fly_date").value = `${today.getFullYear()}-${month}-${day}`
+  }
 
   const form = document.getElementById("flightSearchForm")
   const resultsDiv = document.getElementById("results")
@@ -163,29 +187,31 @@ document.addEventListener("DOMContentLoaded", () => {
     e.preventDefault()
     hide(RESULTS_ID)
 
-    const date = document.getElementById("date").value
+    const fly_date = document.getElementById("fly_date").value
     const from_airport = document.getElementById("from_airport").value
     const to_airport = document.getElementById("to_airport").value
-    const adults = document.getElementById("adults").value
-    const children = document.getElementById("children").value
-    const infants_in_seat = document.getElementById("infants_in_seat").value
-    const infants_on_lap = document.getElementById("infants_on_lap").value
+    const nb_adults = document.getElementById("nb_adults").value
+    const nb_children = document.getElementById("nb_children").value
+    const nb_infants_in_seat = document.getElementById("nb_infants_in_seat").value
+    const nb_infants_on_lap = document.getElementById("nb_infants_on_lap").value
     const cabin_class = document.getElementById("cabin_class").value
     const trip_type = document.getElementById("trip_type").value
 
     const flightFilterBody = {
-      date,
+      fly_date,
       from_airport,
       to_airport,
       cabin_class,
       trip_type,
-      passengers_info: {
-        adults,
-        children,
-        infants_in_seat,
-        infants_on_lap
-      }
+      nb_adults,
+      nb_children,
+      nb_infants_in_seat,
+      nb_infants_on_lap
     }
+
+    // Save filter for next time
+    chrome.storage.local.set({ flightFilter: flightFilterBody })
+
 
     hide(ERROR_ID) 
     show(LOADER_ID)
@@ -208,14 +234,13 @@ document.addEventListener("DOMContentLoaded", () => {
     
     const flights = await response.json();
     hide(LOADER_ID)
- 
 
     // Display results header
     show(RESULTS_ID)
     resultsDiv.innerHTML = `
         <div class="mb-6">
           <h2 class="text-2xl font-bold text-blue-800">Flight Results</h2>
-          <p class="text-gray-600">${from_airport} → ${to_airport} · ${date} · ${cabin_class} · ${trip_type}</p>
+          <p class="text-gray-600">${from_airport} → ${to_airport} · ${fly_date} · ${cabin_class} · ${trip_type}</p>
         </div>
       `
 
@@ -231,7 +256,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 
                 <div class="flex items-center gap-6 w-full justify-between">
                   <div class="flex flex-col items-start">
-                    <span class="text-xl font-semibold text-blue-900">${flight.departure}</span>
+                    <span class="text-xl font-semibold text-blue-900">${flight.departure_time}</span>
                     <span class="text-sm text-gray-500 m-auto">${from_airport}</span>
                   </div>
   
@@ -245,7 +270,7 @@ document.addEventListener("DOMContentLoaded", () => {
                   </div>
   
                   <div class="flex flex-col items-start">
-                    <span class="text-xl font-semibold text-blue-900">${flight.arrival}</span>
+                    <span class="text-xl font-semibold text-blue-900">${flight.arrival_time}</span>
                     <span class="text-sm text-gray-500 m-auto">${to_airport}</span>
                   </div>
                 </div>
@@ -256,12 +281,7 @@ document.addEventListener("DOMContentLoaded", () => {
                   <div class="flex flex-col items-end">
                     <span class="text-2xl font-bold text-blue-900">${flight.price}</span>
                   </div>
-                  <button data-airline="${flight.airline.website}" class="openURL bg-blue-900 hover:bg-blue-800 text-white font-semibold px-6 py-2 rounded-lg flex items-center gap-2 transition-colors">
-                    Select 
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                    </svg>
-                  </button>
+                  ${selectButton(flight.airline.website)}
                 </div>
                 <button class="text-gray-400 hover:text-red-500 transition-colors">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
