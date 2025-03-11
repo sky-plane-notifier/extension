@@ -10,7 +10,8 @@
     },
     "permissions": [
         "tabs",
-        "storage"
+        "storage",
+        "notifications"
     ],
     "action": {
         "default_title": "sky-plane-notifier",
