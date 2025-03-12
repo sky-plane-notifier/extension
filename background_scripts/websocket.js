@@ -39,16 +39,41 @@ export default class CustomWebSocket {
         this.keepAliveIntervalId = this.wsKeepAlive()
     }
 
-    onmessage(e) {
+    async onmessage(e) {
         const data = JSON.parse(e.data)
+        const notificationIds = []
         for (const [key, value] of Object.entries(data)) {
-            chrome.notifications.create({
+            const notificationId = await chrome.notifications.create({
                 type: "basic",
-                title: "New Tracking",
-                message: `A flight with the specified min price have been found through the <<${value.flight_matches[0].airline.name}>> Airline`,
-                iconUrl: "../icons/icon48.png"
+                title: "Tracking matches found",
+                message: `A flight with the specified min price have been found through the <<${value.flight_matches[0].airline.name}>> Airline => price: ${value.flight_matches[0].price} `,
+                iconUrl: "../icons/icon48.png",
+                buttons: [
+                    { title: "Resolve" },
+                    { title: "Dismiss" }
+                ]
+            })
+            notificationIds.push({
+                notificationId,
+                trackingId: key
             })
         }
+        console.log("notificationIds", notificationIds)
+        chrome.notifications.onButtonClicked.addListener((notificationId, buttonIndex) => {
+            const notification = notificationIds.find(n => n.notificationId === notificationId)
+            if (!notification) return
+
+            if (buttonIndex === 0) {
+                const query = new URLSearchParams({
+                    to_resolve: true
+                }).toString()
+
+                fetch(`http://localhost:8000/trackings/${notification.trackingId}/resolve?${query}`, {
+                    method: "PUT",
+                    mode: "cors"
+                })
+            } 
+        })
     }
 
     onclose() {
