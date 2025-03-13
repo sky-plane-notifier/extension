@@ -27,12 +27,7 @@ export default class CustomWebSocket {
     }
 
     onopen() {
-        chrome.notifications.create({
-            type: "basic",
-            title: "Connection Open",
-            message: `The connection to the server has been opened`,
-            iconUrl: "../icons/icon48.png"
-        })
+        console.log("Websocket connection established")
 
         this.retries = 0; // Reset retries
         this.reconnectDelay = this.RECONNECT_DELAY_START; // Reset reconnect delay
@@ -89,13 +84,8 @@ export default class CustomWebSocket {
     }
 
     onclose() {
-            
-        chrome.notifications.create({
-            type: "basic",
-            title: "Connection Closed",
-            message: `Connection closed, attempting to reconnect...`,
-            iconUrl: "../icons/icon48.png"
-        })
+        console.error("Websocket connection closed")
+
         clearInterval(this.keepAliveIntervalId)
         if (this.withRetry && this.retries <= this.maxRetries) {
             this.retryConnecting()
