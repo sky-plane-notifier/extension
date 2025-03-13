@@ -45,12 +45,12 @@ export default class CustomWebSocket {
         for (const [key, value] of Object.entries(data)) {
             const notificationId = await chrome.notifications.create({
                 type: "basic",
-                title: "Tracking matches found",
-                message: `A flight with the specified min price have been found through the <<${value.flight_matches[0].airline.name}>> Airline => price: ${value.flight_matches[0].price} `,
+                title: `Tracking match found: ${value.tracking_details.filter.from_airport} -> ${value.tracking_details.filter.to_airport}`,
+                message: `A flight with a price of ${value.flight_match.price} has been found through the airline ${value.flight_match.airline.name} at ${value.tracking_details.filter.fly_date}!`,
                 iconUrl: "../icons/icon48.png",
                 buttons: [
                     { title: "Resolve" },
-                    { title: "Dismiss" }
+                    { title: "Goto the Extension" }
                 ]
             })
             notificationIds.push({
@@ -58,8 +58,7 @@ export default class CustomWebSocket {
                 trackingId: key
             })
         }
-        console.log("notificationIds", notificationIds)
-        chrome.notifications.onButtonClicked.addListener((notificationId, buttonIndex) => {
+        chrome.notifications.onButtonClicked.addListener(async (notificationId, buttonIndex) => {
             const notification = notificationIds.find(n => n.notificationId === notificationId)
             if (!notification) return
 
@@ -72,7 +71,20 @@ export default class CustomWebSocket {
                     method: "PUT",
                     mode: "cors"
                 })
-            } 
+            } else if (buttonIndex === 1) {
+                const currentWindowId = (await chrome.windows.getCurrent()).id
+                await chrome.windows.update(currentWindowId, { focused: true })
+                chrome.action.openPopup({ windowId: currentWindowId })
+            }
+        })
+        chrome.notifications.onClicked.addListener(async (notificationId) => {
+            const notification = notificationIds.find(n => n.notificationId === notificationId)
+            if (!notification) return
+
+            
+            const currentWindowId = (await chrome.windows.getCurrent()).id
+            await chrome.windows.update(currentWindowId, { focused: true })
+            chrome.action.openPopup({ windowId: currentWindowId })
         })
     }
 
